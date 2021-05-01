@@ -21,7 +21,13 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-
+    
+    if message.content.startswith('!송금'):
+        text = message.content.split(' ')
+        money_dict[message.author.name] = money_dict[message.author.name] - int(text[2])
+        money_dict[text[1]] = money_dict[text[1]] + int(text[2])
+        await message.channel.send('{}님이 {}에게 {}원을 송금하셨습니다.'.format(message.author.mention, text[1], text[2]))
+    
     if message.content.startswith('!홀짝'):
         print(money_dict)
         splited = message.content.split(' ')
