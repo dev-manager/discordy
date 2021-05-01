@@ -27,7 +27,9 @@ async def on_message(message):
     
     if message.content.startswith('!송금'):
         text = message.content.split(' ')
-        if money_dict[message.author.name] < int(text[2]):
+        if text[2].startswith('-'):
+            await message.channel.send('음수는 처리 불가능 합니다.')
+        elif money_dict[message.author.name] < int(text[2]):
             await message.channel.send('금액 오류')
         elif money_dict[message.author.name] > int(text[2]):
             money_dict[message.author.name] = money_dict[message.author.name] - int(text[2])
