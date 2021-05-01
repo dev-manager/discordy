@@ -48,13 +48,15 @@ async def on_message(message):
         else:
             await message.channel.send('홀, 짝을 올바르게 입력해주세요')
         result_bat = random.randint(1, 10)
+        if result_bat % 2 == 1:
+            percent.append('홀')
+        elif result_bat % 2 == 0:
+            percent.append('짝')
         if result_bat % 2 == bat and money_dict[message.author.name] > int(money):
             money_dict[message.author.name] = money_dict[message.author.name] + int(money)
-            percent.append('짝')
             await message.channel.send('{}님 {}원을 얻으셨습니다'.format(message.author.mention, money))
         elif result_bat % 2 != bat and money_dict[message.author.name] > int(money):
             money_dict[message.author.name] = money_dict[message.author.name] - int(money)
-            percent.append('홀')
             await message.channel.send('{}님 {}원을 잃으셨습니다'.format(message.author.mention, money))
         elif money_dict[message.author.name] < int(money):
             await message.channel.send('잔고와 같거나 적은 금액을 베팅해주세요')
