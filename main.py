@@ -10,7 +10,7 @@ token = os.environ.get('token')
 client = discord.Client()
 money_db = open('money.db', 'rb')
 money_dict = pickle.load(money_db)
-
+percent = []
 
 @client.event
 async def on_ready():
@@ -21,6 +21,9 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+    
+    if message.content.startswith('!확률'):
+        await message.channel.send('홀:{}, 짝:{}'.format(percent.count('홀') / len(percent) * 100, percent.count('짝') / len(percent) * 100))
     
     if message.content.startswith('!송금'):
         text = message.content.split(' ')
@@ -45,9 +48,11 @@ async def on_message(message):
         result_bat = random.randint(1, 10)
         if result_bat % 2 == bat and money_dict[message.author.name] > int(money):
             money_dict[message.author.name] = money_dict[message.author.name] + int(money)
+            percent.append('짝')
             await message.channel.send('{}님 {}원을 얻으셨습니다'.format(message.author.mention, money))
         elif result_bat % 2 != bat and money_dict[message.author.name] > int(money):
             money_dict[message.author.name] = money_dict[message.author.name] - int(money)
+            percent.append('홀')
             await message.channel.send('{}님 {}원을 잃으셨습니다'.format(message.author.mention, money))
         elif money_dict[message.author.name] < int(money):
             await message.channel.send('잔고와 같거나 적은 금액을 베팅해주세요')
