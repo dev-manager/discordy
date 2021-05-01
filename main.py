@@ -1,15 +1,13 @@
 import discord
 import dotenv
 import os
-import pickle
 import random
 
 dotenv.load_dotenv('.env')
 token = os.environ.get('token')
 
 client = discord.Client()
-money_db = open('money.db', 'rb')
-money_dict = pickle.load(money_db)
+money_dict = {}
 percent = []
 
 @client.event
