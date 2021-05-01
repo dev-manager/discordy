@@ -39,28 +39,36 @@ async def on_message(message):
     if message.content.startswith('!홀짝'):
         print(money_dict)
         splited = message.content.split(' ')
-        bat = splited[1]
-        money = splited[2]
-        if bat == '홀':
-            bat = 1
-        elif bat == '짝':
-            bat = 0
-        result_bat = random.randint(1, 10)
-        if bat == 1 or bat ==0:
-            if result_bat % 2 == 1:
-                percent.append('홀')
-            elif result_bat % 2 == 0:
-                percent.append('짝')
-            if result_bat % 2 == bat and money_dict[message.author.name] > int(money):
-                money_dict[message.author.name] = money_dict[message.author.name] + int(money)
-                await message.channel.send('{}님 {}원을 얻으셨습니다'.format(message.author.mention, money))
-            elif result_bat % 2 != bat and money_dict[message.author.name] > int(money):
-                money_dict[message.author.name] = money_dict[message.author.name] - int(money)
-                await message.channel.send('{}님 {}원을 잃으셨습니다'.format(message.author.mention, money))
-            elif money_dict[message.author.name] < int(money):
-                await message.channel.send('잔고와 같거나 적은 금액을 베팅해주세요')
+        if splited[1] == '헲':
+            embed = discord.Embed(title=message.author.mention + "님을 위한 헲", description="", color=0x00ff00)
+            embed.add_field(name="!홀짝 <홀, 짝> <금액>", value="홀짝에 성공할경우 금액x2를 되돌려줘요", inline=True)
+            embed.add_field(name="!돈", value="잔고를 확인할수 있어요", inline=True)
+            embed.add_field(name="!확률", value="현재까지의 홀짝 확률을 볼수 있어요", inline=True)
+            await message.channel.send(embed=embed)
+
         else:
-            await message.channel.send('홀, 짝을 올바르게 입력해주세요')
+            bat = splited[1]
+            money = splited[2]
+            if bat == '홀':
+                bat = 1
+            elif bat == '짝':
+                bat = 0
+            result_bat = random.randint(1, 10)
+            if bat == 1 or bat ==0:
+                if result_bat % 2 == 1:
+                    percent.append('홀')
+                elif result_bat % 2 == 0:
+                    percent.append('짝')
+                if result_bat % 2 == bat and money_dict[message.author.name] > int(money):
+                    money_dict[message.author.name] = money_dict[message.author.name] + int(money)
+                    await message.channel.send('{}님 {}원을 얻으셨습니다'.format(message.author.mention, money))
+                elif result_bat % 2 != bat and money_dict[message.author.name] > int(money):
+                    money_dict[message.author.name] = money_dict[message.author.name] - int(money)
+                    await message.channel.send('{}님 {}원을 잃으셨습니다'.format(message.author.mention, money))
+                elif money_dict[message.author.name] < int(money):
+                    await message.channel.send('잔고와 같거나 적은 금액을 베팅해주세요')
+            else:
+                    await message.channel.send('홀, 짝을 올바르게 입력해주세요')
 
 
     if message.content.startswith('!돈'):
