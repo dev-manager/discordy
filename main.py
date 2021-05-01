@@ -24,9 +24,12 @@ async def on_message(message):
     
     if message.content.startswith('!송금'):
         text = message.content.split(' ')
-        money_dict[message.author.name] = money_dict[message.author.name] - int(text[2])
-        money_dict[text[1]] = money_dict[text[1]] + int(text[2])
-        await message.channel.send('{}님이 {}에게 {}원을 송금하셨습니다.'.format(message.author.mention, text[1], text[2]))
+        if money_dict[message.author.name] < int(text[2]):
+            await message.channel.send('금액 오류')
+        elif money_dict[message.author.name] > int(text[2]):
+            money_dict[message.author.name] = money_dict[message.author.name] - int(text[2])
+            money_dict[text[1]] = money_dict[text[1]] + int(text[2])
+            await message.channel.send('{}님이 {}에게 {}원을 송금하셨습니다.'.format(message.author.mention, text[1], text[2]))
     
     if message.content.startswith('!홀짝'):
         print(money_dict)
@@ -40,13 +43,13 @@ async def on_message(message):
         else:
             await message.channel.send('홀, 짝을 올바르게 입력해주세요')
         result_bat = random.randint(1, 10)
-        if result_bat % 2 == bat and money_dict[message.author.name] <= int(money):
+        if result_bat % 2 == bat and money_dict[message.author.name] > int(money):
             money_dict[message.author.name] = money_dict[message.author.name] + int(money)
             await message.channel.send('{}님 {}원을 얻으셨습니다'.format(message.author.mention, money))
-        elif result_bat % 2 == bat and money_dict[message.author.name] <= int(money):
+        elif result_bat % 2 != bat and money_dict[message.author.name] > int(money):
             money_dict[message.author.name] = money_dict[message.author.name] - int(money)
             await message.channel.send('{}님 {}원을 잃으셨습니다'.format(message.author.mention, money))
-        elif money_dict[message.author.name] > int(money):
+        elif money_dict[message.author.name] < int(money):
             await message.channel.send('잔고와 같거나 적은 금액을 베팅해주세요')
 
 
@@ -62,4 +65,5 @@ async def on_message(message):
             money_dict[message.author.name] = 10000
             await message.channel.send(message.author.mention + '님 지갑 생성이 완료되었습니다')
         print(money_dict)
+
 client.run(token)
