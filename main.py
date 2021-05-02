@@ -1,7 +1,7 @@
 import discord
 import random
 
-token = 'ODM3OTUwMjMyMTQxODg5NTY3.YIz_9w.3rbqjdZGblfeoc6BFMQ63UXQCms'
+token = '---input token---'
 client = discord.Client()
 money_dict = {}
 loan_dict = {}
