@@ -7,7 +7,7 @@ loan_file = open('loan.db', 'rb')
 loan_count_file = open('loan_count.db', 'rb')
 percent_file = open('percent.db', 'rb')
 
-token = 'ODM3OTUwMjMyMTQxODg5NTY3.YIz_9w.r_ZuAHRYPapOI7Ve2VkQmo4pkmM'
+token = '--token--'
 client = discord.Client()
 
 money_dict = pickle.load(money_file)
