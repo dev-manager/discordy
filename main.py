@@ -1,13 +1,24 @@
 import discord
 import random
+import pickle
 
-token = '---input token---'
+money_file = open('money.db', 'rb')
+loan_file = open('loan.db', 'rb')
+loan_count_file = open('loan_count.db', 'rb')
+percent_file = open('percent.db', 'rb')
+
+token = 'ODM3OTUwMjMyMTQxODg5NTY3.YIz_9w.r_ZuAHRYPapOI7Ve2VkQmo4pkmM'
 client = discord.Client()
-money_dict = {}
-loan_dict = {}
-loan_count_dict = {}
-percent = []
 
+money_dict = pickle.load(money_file)
+loan_dict = pickle.load(loan_file)
+loan_count_dict = pickle.load(loan_count_file)
+percent = pickle.load(percent_file)
+
+money_file.close()
+loan_file.close()
+loan_count_file.close()
+percent_file.close()
 
 @client.event
 async def on_ready():
@@ -19,6 +30,36 @@ async def on_message(message):
     if message.author == client.user:
         return
     
+    if message.content.startswith('!종료'):
+        if message.author.guild_permissions.moderater:
+            await message.channel.send('안녕히 계세요 여러분')
+            exit(1)
+        elif not message.author.guild_permissions.moderater:
+            await message.channel.send('서버 관리자 권한이 필요합니다')
+    
+    if message.content.startswith('!백업'):
+        if message.author.guild_permissions.moderater:
+            money_file = open('money.db', 'wb')
+            loan_file = open('loan.db', 'wb')
+            loan_count_file = open('loan_count.db', 'wb')
+            percent_file = open('percent.db', 'wb')
+            
+            pickle.dump(money_dict, money_file)
+            await message.channel.send('잔고 db 백업 완료')
+            pickle.dump(loan_dict, loan_file)
+            await message.channel.send('대출 db 백업 완료')
+            pickle.dump(loan_count_file, loan_count_file)
+            await message.channel.send('대출 횟수 db 백업 완료')
+            pickle.dump(percent, percent_file)
+            await message.channel.send('퍼센트 db 백업 완료')
+            
+            money_file.close()
+            loan_file.close()
+            loan_count_file.close()
+            percent_file.close()
+        elif not message.author.guild_permissions.moderater:
+            await message.channel.send('서버 관리자 권한이 필요합니다')
+
     if message.content.startswith('!상환'):
         if loan_dict[message.author.name] == 0:
             await message.channel.send('상환할 금액이 없습니다')
