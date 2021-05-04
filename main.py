@@ -7,7 +7,7 @@ loan_file = open('loan.db', 'rb')
 loan_count_file = open('loan_count.db', 'rb')
 percent_file = open('percent.db', 'rb')
 
-token = 'ODM3OTUwMjMyMTQxODg5NTY3.YIz_9w.BwpvGDZeki9GffyAwi_9HeimDM8'
+token = '---'
 client = discord.Client()
 
 money_dict = pickle.load(money_file)
@@ -95,11 +95,10 @@ async def on_message(message):
                         loan_count_dict[message.author.name] += 1
                         print(loan_dict, loan_count_dict, money_dict)
                         await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount,round(int(amount) + (int(amount) * (0.05 * len(amount))))))
-                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(
-                            10 - loan_count_dict.get(message.author.name)))
+                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
                     else:
                         amount = amount[1]
-                        loan_dict[message.author.name] += round(int(amount) +  (int(amount) * (0.05 * len(amount))))
+                        loan_dict[message.author.name] += round(int(amount) +  int(amount) * 0.05)
                         money_dict[message.author.name] += int(amount)
                         loan_count_dict[message.author.name] += 1
                         print(loan_dict, loan_count_dict, money_dict)
