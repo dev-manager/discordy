@@ -31,14 +31,14 @@ async def on_message(message):
         return
     
     if message.content.startswith('!종료'):
-        if message.author.guild_permissions.moderater:
+        if message.author.guild_permissions.manage_guild:
             await message.channel.send('안녕히 계세요 여러분')
             exit(1)
-        elif not message.author.guild_permissions.moderater:
+        elif not message.author.guild_permissions.manage_guild:
             await message.channel.send('서버 관리자 권한이 필요합니다')
     
     if message.content.startswith('!백업'):
-        if message.author.guild_permissions.moderater:
+        if message.author.guild_permissions.manage_guild:
             money_file = open('money.db', 'wb')
             loan_file = open('loan.db', 'wb')
             loan_count_file = open('loan_count.db', 'wb')
@@ -48,7 +48,7 @@ async def on_message(message):
             await message.channel.send('잔고 db 백업 완료')
             pickle.dump(loan_dict, loan_file)
             await message.channel.send('대출 db 백업 완료')
-            pickle.dump(loan_count_file, loan_count_file)
+            pickle.dump(loan_count_dict, loan_count_file)
             await message.channel.send('대출 횟수 db 백업 완료')
             pickle.dump(percent, percent_file)
             await message.channel.send('퍼센트 db 백업 완료')
@@ -57,7 +57,7 @@ async def on_message(message):
             loan_file.close()
             loan_count_file.close()
             percent_file.close()
-        elif not message.author.guild_permissions.moderater:
+        elif not message.author.guild_permissions.manage_guild:
             await message.channel.send('서버 관리자 권한이 필요합니다')
 
     if message.content.startswith('!상환'):
