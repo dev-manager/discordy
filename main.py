@@ -1,15 +1,13 @@
 import discord
 import random
 import pickle
-from .server_func import restart
-import threading
 
 money_file = open('money.db', 'rb')
 loan_file = open('loan.db', 'rb')
 loan_count_file = open('loan_count.db', 'rb')
 percent_file = open('percent.db', 'rb')
 
-token = '--token--'
+token = 'ODM3OTUwMjMyMTQxODg5NTY3.YIz_9w.BwpvGDZeki9GffyAwi_9HeimDM8'
 client = discord.Client()
 
 money_dict = pickle.load(money_file)
@@ -22,43 +20,16 @@ loan_file.close()
 loan_count_file.close()
 percent_file.close()
 
+
 @client.event
 async def on_ready():
     print("logged in as {0.user}".format(client))
     
 
-
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
-    
-    if message.content.startswith('!재시작'):
-        money_file = open('money.db', 'wb')
-        loan_file = open('loan.db', 'wb')
-        loan_count_file = open('loan_count.db', 'wb')
-        percent_file = open('percent.db', 'wb')
-    
-        pickle.dump(money_dict, money_file)
-        await message.channel.send('잔고 db 백업 완료')
-        pickle.dump(loan_dict, loan_file)
-        await message.channel.send('대출 db 백업 완료')
-        pickle.dump(loan_count_dict, loan_count_file)
-        await message.channel.send('대출 횟수 db 백업 완료')
-        pickle.dump(percent, percent_file)
-        await message.channel.send('퍼센트 db 백업 완료')
-    
-        money_file.close()
-        loan_file.close()
-        loan_count_file.close()
-        percent_file.close()
-        message.channel.send('서버를 재시작 합니다. 3분 이상이 소요될수 있습니다.')
-        thread = threading.Thread(target=restart, args=tuple(['main.py']))
-        thread.setDaemon(False)
-        thread.start()
-        exit(1)
-        
-        
 
     if message.content.startswith('!종료'):
         if message.author.guild_permissions.manage_guild:
@@ -117,13 +88,23 @@ async def on_message(message):
                 if amount[1].startswith('-'):
                     await message.channel.send('음수는 대출 불가능합니다')
                 else:
-                    amount = int(amount[1])
-                    loan_dict[message.author.name] += round(int(amount) * 1.2)
-                    money_dict[message.author.name] += amount
-                    loan_count_dict[message.author.name] += 1
-                    print(loan_dict, loan_count_dict, money_dict)
-                    await message.channel.send(message.author.mention + '님 {}원 대출 완료 되었습니다'.format(amount))
-                    await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
+                    if not len(amount[1]) > 6:
+                        amount = amount[1]
+                        loan_dict[message.author.name] += round(int(amount) + int(amount) * 0.05)
+                        money_dict[message.author.name] += int(amount)
+                        loan_count_dict[message.author.name] += 1
+                        print(loan_dict, loan_count_dict, money_dict)
+                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount,round(int(amount) + (int(amount) * (0.05 * len(amount))))))
+                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(
+                            10 - loan_count_dict.get(message.author.name)))
+                    else:
+                        amount = amount[1]
+                        loan_dict[message.author.name] += round(int(amount) +  (int(amount) * (0.05 * len(amount))))
+                        money_dict[message.author.name] += int(amount)
+                        loan_count_dict[message.author.name] += 1
+                        print(loan_dict, loan_count_dict, money_dict)
+                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) +  (int(amount) * (0.05 * len(amount))))))
+                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
 
     if message.content.startswith('!확률'):
         await message.channel.send('홀:{}, 짝:{}'.format(percent.count('홀') / len(percent) * 100, percent.count('짝') / len(percent) * 100))
