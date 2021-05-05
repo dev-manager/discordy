@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import discord
 import random
 import pickle
@@ -90,19 +91,19 @@ async def on_message(message):
                 else:
                     if not len(amount[1]) > 6:
                         amount = amount[1]
+                        loan_dict[message.author.name] += round(round(int(amount) + (int(amount) * (0.05 * len(amount)))))
+                        money_dict[message.author.name] += int(amount)
+                        loan_count_dict[message.author.name] += 1
+                        print(loan_dict, loan_count_dict, money_dict)
+                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) + (int(amount) * (0.05 * len(amount))))))
+                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
+                    else:
+                        amount = amount[1]
                         loan_dict[message.author.name] += round(int(amount) + int(amount) * 0.05)
                         money_dict[message.author.name] += int(amount)
                         loan_count_dict[message.author.name] += 1
                         print(loan_dict, loan_count_dict, money_dict)
-                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount,round(int(amount) + (int(amount) * (0.05 * len(amount))))))
-                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
-                    else:
-                        amount = amount[1]
-                        loan_dict[message.author.name] += round(int(amount) +  int(amount) * 0.05)
-                        money_dict[message.author.name] += int(amount)
-                        loan_count_dict[message.author.name] += 1
-                        print(loan_dict, loan_count_dict, money_dict)
-                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) +  (int(amount) * (0.05 * len(amount))))))
+                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) + int(amount) * 0.05)))
                         await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
 
     if message.content.startswith('!확률'):
@@ -134,7 +135,10 @@ async def on_message(message):
             embed.add_field(name="!상환 <금액>", value="대출 상환을 할수 있어요, 나눠서 상환할수 있으니 걱정 마세요", inline=True)
             embed.add_field(name="게임 룰", value="대출 횟수가 10회를 넘어가면 게임 오버에요\n 제한된 대출 안에서 최대한 오래 살아 남길 바래요", inline=True)
             await message.channel.send(embed=embed)
-
+        
+        elif splited[1] == '홀짝':
+            await message.channel.send('고니: 싸늘하다. 가슴에 비수가 날아와 꽂힌다. 하지만 걱정하지 마라. 손은 눈보다 빠르니까. 아귀한테 밑에서 한 장, 정마담도 밑에서 한 장, 나 한 장. 아귀한테 다시 밑에서 한 장, 이제 정마담에게 마지막 한 장... \n아귀: 동작 그만 밑장빼기냐?\n고니: 뭐야.\n아귀: 내 패하고 정 마담 패를 밑에서 뺐지? 내가 빙다리 핫바지로 보이냐 이 새끼야.\n고니: 증거 있어?\n아귀: 증거? 증거 있지! 너는 나한테 9땡을 줬을 것이여. 그리고 정마담한테 줄려는 이거 이거, 이거 장짜리 아니여? 자, 모두들 보쇼. 정마담한테 장땡을 줘서 이 판을 끝내겠다, 이거 아녀?\n고니: 시나리오 쓰고 있네, 미친 새끼가!\n아귀: 으허허허허허허허\n호구: 예림이! 그 패 봐봐. 혹시 장이야?\n아귀: 패 건들지 마! 손모가지 날라가분께. 해머 갖고 와!\n정마담: 정말 이렇게까지 해야 돼?\n고니: 잠깐. 그렇게 피를 봐야겠어?\n아귀: 구라치다 걸리면 피 보는 거 안 배웠냐?\n고니: 좋아. 이 패가 단풍이 아니라는 거에 내 돈 모두하고 내 손모가지 건다. 쫄리면 뒈지시든지.\n아귀: 이 Tlqkf놈이 어디서 약을 팔어?\n고니: Tlqkf, 천하의 아귀가 혓바닥이 왜 이렇게 길어? 후달리냐?\n아귀: 후달려? 으허허허허허. 오냐, 내 돈 모두하고 내 손모가지를 건다. 둘 다 묶어.\n아귀: 준비됐어? 까볼까? 자, 지금부터 확인 들어가겄습니다. 따라라란 따라란 따라란 딴 쿵작짜쿵작짜 따라리라라리\n선장: 사쿠라네!\n호구: 사쿠라야?\n아귀: 내가 봤어. 이 Tlqkf놈 밑장 빼는 걸 똑똑히 봤다니께?\n고니: 확실하지 않으면 승부를 걸지 마라 이런 거 안 배웠어? 뭐해, 니네 형님 손 안 찍고.\n아귀: 야, 이 Tlqkf놈 손모가지 찍어!')
+        
         else:
             if splited[2].isdigit():
                 if splited[2].startswith('-'):
