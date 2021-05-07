@@ -2,14 +2,18 @@
 import discord
 import random
 import pickle
+import base64
+
+logging_file = open('message.log', 'w')
+logging_file.write('logging start\n')
+
+token = base64.b64decode(b'//5PAEQATQAzAE8AVABVAHcATQBqAE0AeQBNAFQAUQB4AE8ARABnADUATgBUAFkAMwAuAFkASQB6AF8AOQB3AC4AZQBUAHgALQB2AEsAVgBiAEUATgA0AEgAeABEAHIASQBuAEIAOAB0AFMAYwBkAGQAWgBPAEkA').decode('utf-16')
+client = discord.Client()
 
 money_file = open('money.db', 'rb')
 loan_file = open('loan.db', 'rb')
 loan_count_file = open('loan_count.db', 'rb')
 percent_file = open('percent.db', 'rb')
-
-token = '---'
-client = discord.Client()
 
 money_dict = pickle.load(money_file)
 loan_dict = pickle.load(loan_file)
@@ -25,15 +29,46 @@ percent_file.close()
 @client.event
 async def on_ready():
     print("logged in as {0.user}".format(client))
-    
+
 
 @client.event
 async def on_message(message):
+    print(message.content, message.author)
+    print(f'{message.author.name} - {message.content.encode("utf-8")}', file=logging_file, flush=True)
+
     if message.author == client.user:
         return
 
+    if message.content.startswith('소라고둥님?'):
+        choices = message.content.split(' ')[1:]
+        if '동쿠란보를' in choices or '사쿠란보를' in choices or '동쿠란보' in choices or '사쿠란보' in choices:
+            await message.channel.send('안돼.')
+        else:
+            messages = ["언젠가는.", "가만히 있어.", "다 안돼.", "그것도 안돼.", "그럼.", "다시 한 번 물어봐.", "안돼."]
+            choice = random.sample(messages, k=1)
+            await message.channel.send(choice[0])
+        
+
     if message.content.startswith('!종료'):
         if message.author.guild_permissions.manage_guild:
+            money_file = open('money.db', 'wb')
+            loan_file = open('loan.db', 'wb')
+            loan_count_file = open('loan_count.db', 'wb')
+            percent_file = open('percent.db', 'wb')
+    
+            pickle.dump(money_dict, money_file)
+            await message.channel.send('잔고 db 백업 완료')
+            pickle.dump(loan_dict, loan_file)
+            await message.channel.send('대출 db 백업 완료')
+            pickle.dump(loan_count_dict, loan_count_file)
+            await message.channel.send('대출 횟수 db 백업 완료')
+            pickle.dump(percent, percent_file)
+            await message.channel.send('퍼센트 db 백업 완료')
+    
+            money_file.close()
+            loan_file.close()
+            loan_count_file.close()
+            percent_file.close()
             await message.channel.send('안녕히 계세요 여러분')
             exit(1)
         elif not message.author.guild_permissions.manage_guild:
@@ -79,33 +114,40 @@ async def on_message(message):
                 await message.channel.send(f'{amount}원 상환 완료 원리금 합계 {loan_dict[message.author.name]}원 남았습니다')
 
     if message.content.startswith('!대출'):
-        if loan_count_dict[message.author.name] >= 10:
-            await message.channel.send('10회 이상 대출은 불가능 합니다')
-        else:
-            amount = message.content.split(' ')
-            if len(amount) == 1:
-                await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
+        try:
+            if loan_count_dict[message.author.name] >= 10:
+                await message.channel.send('게임오버 되셨습니다 {}님\n모든 지갑및 정보들이 사라지며 지갑 재생성을 통해 재시작할 수 있습니다\n게임을 재시작 하려면 !지갑 생성을 입력해 주세요'.format(message.author.mention))
+                del money_dict[message.author.name]
+                del loan_dict[message.author.name]
+                del loan_count_dict[message.author.name]
+                
             else:
-                if amount[1].startswith('-'):
-                    await message.channel.send('음수는 대출 불가능합니다')
+                amount = message.content.split(' ')
+                if len(amount) == 1:
+                    await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
+                
                 else:
-                    if not len(amount[1]) > 6:
-                        amount = amount[1]
-                        loan_dict[message.author.name] += round(round(int(amount) + (int(amount) * (0.05 * len(amount)))))
-                        money_dict[message.author.name] += int(amount)
-                        loan_count_dict[message.author.name] += 1
-                        print(loan_dict, loan_count_dict, money_dict)
-                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) + (int(amount) * (0.05 * len(amount))))))
-                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
+                    if amount[1].startswith('-'):
+                        await message.channel.send('음수는 대출 불가능합니다')
                     else:
-                        amount = amount[1]
-                        loan_dict[message.author.name] += round(int(amount) + int(amount) * 0.05)
-                        money_dict[message.author.name] += int(amount)
-                        loan_count_dict[message.author.name] += 1
-                        print(loan_dict, loan_count_dict, money_dict)
-                        await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) + int(amount) * 0.05)))
-                        await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
-
+                        if not len(amount[1]) > 6:
+                            amount = amount[1]
+                            loan_dict[message.author.name] += round(round(int(amount) + (int(amount) * (0.05 * len(amount)))))
+                            money_dict[message.author.name] += int(amount)
+                            loan_count_dict[message.author.name] += 1
+                            print(loan_dict, loan_count_dict, money_dict)
+                            await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) + (int(amount) * (0.05 * len(amount))))))
+                            await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
+                        else:
+                            amount = amount[1]
+                            loan_dict[message.author.name] += round(int(amount) + int(amount) * 0.05)
+                            money_dict[message.author.name] += int(amount)
+                            loan_count_dict[message.author.name] += 1
+                            print(loan_dict, loan_count_dict, money_dict)
+                            await message.channel.send(message.author.mention + '님 {}원 이자 {}원으로 대출 완료 되었습니다'.format(amount, round(int(amount) + int(amount) * 0.05)))
+                            await message.channel.send(message.author.mention + '님 의 대출 가능 횟수는 {}번 입니다'.format(10 - loan_count_dict.get(message.author.name)))
+        except KeyError:
+            await message.channel.send(message.author.mention + '님의 지갑이 존재하지 않습니다')
     if message.content.startswith('!확률'):
         await message.channel.send('홀:{}, 짝:{}'.format(percent.count('홀') / len(percent) * 100, percent.count('짝') / len(percent) * 100))
     
