@@ -40,11 +40,12 @@ async def on_message(message):
         return
 
     if message.content.startswith('소라고둥님?'):
+        choice = []
         choices = message.content.split(' ')[1:]
         if '동쿠란보를' in choices or '사쿠란보를' in choices or '동쿠란보' in choices or '사쿠란보' in choices:
-            await message.channel.send('안돼.')
+            await message.channel.send('절대 안돼.')
         else:
-            messages = ["언젠가는.", "가만히 있어.", "다 안돼.", "그것도 안돼.", "그럼.", "다시 한 번 물어봐.", "안돼."]
+            messages = ["언젠가는.", "가만히 있어.", "다 안돼.", "그것도 안돼.", "그럼.", "다시 한 번 물어봐.", "안돼.", "절대 안돼."]
             choice = random.sample(messages, k=1)
             await message.channel.send(choice[0])
         
