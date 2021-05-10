@@ -40,7 +40,6 @@ async def on_message(message):
         return
 
     if message.content.startswith('소라고둥님?'):
-        choice = []
         choices = message.content.split(' ')[1:]
         if '동쿠란보를' in choices or '사쿠란보를' in choices or '동쿠란보' in choices or '사쿠란보' in choices:
             await message.channel.send('절대 안돼.')
@@ -49,7 +48,6 @@ async def on_message(message):
             choice = random.sample(messages, k=1)
             await message.channel.send(choice[0])
         
-
     if message.content.startswith('!종료'):
         if message.author.guild_permissions.manage_guild:
             money_file = open('money.db', 'wb')
@@ -131,7 +129,7 @@ async def on_message(message):
                     if amount[1].startswith('-'):
                         await message.channel.send('음수는 대출 불가능합니다')
                     else:
-                        if not len(amount[1]) > 6:
+                        if not len(amount[1]) >= 6:
                             amount = amount[1]
                             loan_dict[message.author.name] += round(round(int(amount) + (int(amount) * (0.05 * len(amount)))))
                             money_dict[message.author.name] += int(amount)
@@ -150,7 +148,7 @@ async def on_message(message):
         except KeyError:
             await message.channel.send(message.author.mention + '님의 지갑이 존재하지 않습니다')
     if message.content.startswith('!확률'):
-        await message.channel.send('홀:{}, 짝:{}'.format(percent.count('홀') / len(percent) * 100, percent.count('짝') / len(percent) * 100))
+        await message.channel.send('홀:{}, 짝:{}'.format(round(percent.count('홀') / len(percent) * 100, 3), round(percent.count('짝') / len(percent) * 100)), 3)
     
     if message.content.startswith('!송금'):
         text = message.content.split(' ')
@@ -180,7 +178,7 @@ async def on_message(message):
             await message.channel.send(embed=embed)
         
         elif splited[1] == '홀짝':
-            await message.channel.send('고니: 싸늘하다. 가슴에 비수가 날아와 꽂힌다. 하지만 걱정하지 마라. 손은 눈보다 빠르니까. 아귀한테 밑에서 한 장, 정마담도 밑에서 한 장, 나 한 장. 아귀한테 다시 밑에서 한 장, 이제 정마담에게 마지막 한 장... \n아귀: 동작 그만 밑장빼기냐?\n고니: 뭐야.\n아귀: 내 패하고 정 마담 패를 밑에서 뺐지? 내가 빙다리 핫바지로 보이냐 이 새끼야.\n고니: 증거 있어?\n아귀: 증거? 증거 있지! 너는 나한테 9땡을 줬을 것이여. 그리고 정마담한테 줄려는 이거 이거, 이거 장짜리 아니여? 자, 모두들 보쇼. 정마담한테 장땡을 줘서 이 판을 끝내겠다, 이거 아녀?\n고니: 시나리오 쓰고 있네, 미친 새끼가!\n아귀: 으허허허허허허허\n호구: 예림이! 그 패 봐봐. 혹시 장이야?\n아귀: 패 건들지 마! 손모가지 날라가분께. 해머 갖고 와!\n정마담: 정말 이렇게까지 해야 돼?\n고니: 잠깐. 그렇게 피를 봐야겠어?\n아귀: 구라치다 걸리면 피 보는 거 안 배웠냐?\n고니: 좋아. 이 패가 단풍이 아니라는 거에 내 돈 모두하고 내 손모가지 건다. 쫄리면 뒈지시든지.\n아귀: 이 Tlqkf놈이 어디서 약을 팔어?\n고니: Tlqkf, 천하의 아귀가 혓바닥이 왜 이렇게 길어? 후달리냐?\n아귀: 후달려? 으허허허허허. 오냐, 내 돈 모두하고 내 손모가지를 건다. 둘 다 묶어.\n아귀: 준비됐어? 까볼까? 자, 지금부터 확인 들어가겄습니다. 따라라란 따라란 따라란 딴 쿵작짜쿵작짜 따라리라라리\n선장: 사쿠라네!\n호구: 사쿠라야?\n아귀: 내가 봤어. 이 Tlqkf놈 밑장 빼는 걸 똑똑히 봤다니께?\n고니: 확실하지 않으면 승부를 걸지 마라 이런 거 안 배웠어? 뭐해, 니네 형님 손 안 찍고.\n아귀: 야, 이 Tlqkf놈 손모가지 찍어!')
+            await message.channel.send('고니: 싸늘하다. 가슴에 비수가 날아와 꽂힌다. 하지만 걱정하지 마라. 손은 눈보다 빠르니까. 아귀한테 밑에서 한 장, 정마담도 밑에서 한 장, 나 한 장. 아귀한테 다시 밑에서 한 장, 이제 정마담에게 마지막 한 장... \n아귀: 동작 그만 밑장빼기냐?\n고니: 뭐야.\n아귀: 내 패하고 정 마담 패를 밑에서 뺐지? 내가 빙다리 핫바지로 보이냐 이 새끼야.\n고니: 증거 있어?\n아귀: 증거? 증거 있지! 너는 나한테 9땡을 줬을 것이여. 그리고 정마담한테 줄려는 이거 이거, 이거 장짜리 아니여? 자, 모두들 보쇼. 정마담한테 장땡을 줘서 이 판을 끝내겠다, 이거 아녀?\n고니: 시나리오 쓰고 있네, 미친 새끼가!\n아귀: 으허허허허허허허\n호구: 예림이! 그 패 봐봐. 혹시 장이야?\n아귀: 패 건들지 마! 손모가지 날라가분께. 해머 갖고 와!\n정마담: 정말 이렇게까지 해야 해?\n고니: 잠깐. 그렇게 피를 봐야겠어?\n아귀: 구라치다 걸리면 피 보는 거 안 배웠냐?\n고니: 좋아. 이 패가 단풍이 아니라는 거에 내 돈 모두하고 내 손모가지 건다. 쫄리면 뒈지시든지.\n아귀: 이 Tlqkf놈이 어디서 약을 팔어?\n고니: Tlqkf, 천하의 아귀가 혓바닥이 왜 이렇게 길어? 후달리냐?\n아귀: 후달려? 으허허허허허. 오냐, 내 돈 모두하고 내 손모가지를 건다. 둘 다 묶어.\n아귀: 준비됐어? 까볼까? 자, 지금부터 확인 들어가겄습니다. 따라라란 따라란 따라란 딴 쿵작짜쿵작짜 따라리라라리\n선장: 사쿠라네!\n호구: 사쿠라야?\n아귀: 내가 봤어. 이 Tlqkf놈 밑장 빼는 걸 똑똑히 봤다니께?\n고니: 확실하지 않으면 승부를 걸지 마라 이런 거 안 배웠어? 뭐해, 니네 형님 손 안 찍고.\n아귀: 야, 이 Tlqkf놈 손모가지 찍어!')
         
         else:
             if splited[2].isdigit():
@@ -217,8 +215,7 @@ async def on_message(message):
         if money_dict[message.author.name] is None:
             await message.channel.send('지갑이 존재하지 않습니다 지갑을 생성해 주세요.')
         else:
-            await message.channel.send(message.author.mention + '님의 잔고는 {}원 입니다.'.format(money_dict.get(message.author.name)))
-            await message.channel.send(message.author.mention + '님의 상환금은 {}원 입니다.'.format(loan_dict.get(message.author.name)))
+            await message.channel.send(message.author.mention + ' 님의 잔고는 {}원 입니다.\n{} 님의 상환금은 {}원 입니다'.format(money_dict.get(message.author.name), message.author.mention, loan_dict.get(message.author.name)))
 
     if message.content.startswith('!지갑 생성'):
         if message.author.name in list(money_dict.keys()):
