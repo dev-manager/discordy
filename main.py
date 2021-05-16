@@ -5,7 +5,9 @@ import pickle
 import base64
 import datetime
 import os
+from cryptocurrency import Crypto
 
+crypto = Crypto()
 logging_file = open("message.log", "w")
 logging_file.write("logging start\n")
 
@@ -29,6 +31,8 @@ money_file.close()
 loan_file.close()
 loan_count_file.close()
 percent_file.close()
+coin_dict = {}
+coin_price = {}
 
 
 def is_me(m):
@@ -53,6 +57,58 @@ async def on_message(message):
     
     if message.author == client.user:
         return
+    
+    if message.content.startswith('!crypto'):
+        command = message.content.split(' ')[1]
+        if command == "list":
+            await message.channel.send(crypto.coin_list)
+        elif command == "price":
+            coin_price = crypto.get_price()
+            await message.channel.send("Bitcoin: {}, Ethereum: {}, Doge: {}".format(str(coin_price[0]) + "￦", str(coin_price[1]) + "￦", str(coin_price[2])  + "￦"))
+        elif command == "buy":
+            coin = message.content.split(' ')[2]
+            count = message.content.split(' ')[3]
+            if coin == 'doge':
+                coin_id = 2
+            elif coin == 'eth':
+                coin_id = 1
+            elif coin =='btc':
+                coin_id = 0
+            currunt_price = round(crypto.get_price()[coin_id]) * float(count)
+            if currunt_price > money_dict[message.author.name]:
+                await message.channel.send("잔액이 부족합니다")
+            else:
+                money_dict[message.author.name] -= currunt_price
+                coin_dict[message.author.name][coin_id] += float(count)
+                print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
+                await message.channel.send(f'{coin.upper()} successfully ordered')
+        elif command == "sell":
+            coin = message.content.split(' ')[2]
+            count = message.content.split(' ')[3]
+            if coin == 'doge':
+                coin_id = 2
+            elif coin == 'eth':
+                coin_id = 1
+            elif coin == 'btc':
+                coin_id = 0
+            currunt_price = round(crypto.get_price()[coin_id]) * float(count)
+            money_dict[message.author.name] += currunt_price
+            coin_dict[message.author.name][coin_id] -= float(count)
+            print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
+            await message.channel.send(f'{coin.upper()} successfully selled\nYour cryptos are BTC: {coin_dict[message.author.name][0]} ETH: {coin_dict[message.author.name][1]} DOGE: {coin_dict[message.author.name][2]}')
+        elif command == 'wallet':
+            command2 = message.content.split(' ')
+            try:
+                if command2[2] == 'create':
+                    coin_dict[message.author.name] = {0:0, 1:0, 2:0}
+                    await message.channel.send('Your crypto wallet is created')
+            except IndexError:
+                wallet = coin_dict.get(message.author.name)
+                if wallet is None:
+                    await message.channel.send('Your crypto wallet not detected\nuse !crypto wallet create')
+                else:
+                    await message.channel.send(f"Bitcoin: {wallet.get(0)} Ethereum: {wallet.get(1)} Dogecoin: {wallet.get(2)}")
+            
     
     if focus_.get(message.author.id) is None:
         focus_[message.author.id] = False
@@ -113,7 +169,8 @@ async def on_message(message):
             loan = open("loan.db", "wb")
             loan_count = open("loan_count.db", "wb")
             percent_ = open("percent.db", "wb")
-
+            coin__ = open("coin.db", 'wb')
+            
             pickle.dump(money_dict, money)
             await message.channel.send("잔고 db 백업 완료")
             pickle.dump(loan_dict, loan)
@@ -122,16 +179,41 @@ async def on_message(message):
             await message.channel.send("대출 횟수 db 백업 완료")
             pickle.dump(percent, percent_)
             await message.channel.send("퍼센트 db 백업 완료")
-    
+            pickle.dump(coin_dict, coin__)
+            
             money.close()
             loan.close()
             loan_count.close()
             percent_.close()
+            coin__.close()
             await message.channel.send("Process 종료됨")
             exit(1)
         elif not message.author.guild_permissions.manage_guild:
             await message.channel.send("서버 관리자 권한이 필요합니다")
-
+    
+    elif message.content.startswith('!백업'):
+        money = open("money.db", "wb")
+        loan = open("loan.db", "wb")
+        loan_count = open("loan_count.db", "wb")
+        percent_ = open("percent.db", "wb")
+        coin__ = open("coin.db",  'wb')
+    
+        pickle.dump(money_dict, money)
+        await message.channel.send("잔고 db 백업 완료")
+        pickle.dump(loan_dict, loan)
+        await message.channel.send("대출 db 백업 완료")
+        pickle.dump(loan_count_dict, loan_count)
+        await message.channel.send("대출 횟수 db 백업 완료")
+        pickle.dump(percent, percent_)
+        await message.channel.send("퍼센트 db 백업 완료")
+        pickle.dump(coin_dict, coin__)
+        
+        money.close()
+        loan.close()
+        loan_count.close()
+        percent_.close()
+        coin__.close()
+    
     elif message.content.startswith("!상환"):
         if loan_dict[message.author.name] == 0:
             await message.channel.send("상환할 금액이 없습니다")
