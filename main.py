@@ -22,7 +22,7 @@ loan_file = open("loan.db", "rb")
 loan_count_file = open("loan_count.db", "rb")
 percent_file = open("percent.db", "rb")
 
-money_dict = {}
+money_dict = pickle.load(money_file)
 loan_dict = pickle.load(loan_file)
 loan_count_dict = pickle.load(loan_count_file)
 percent = pickle.load(percent_file)
@@ -59,6 +59,7 @@ async def on_message(message):
         return
     
     if message.content.startswith('!crypto'):
+        coin_id = 0
         command = message.content.split(' ')[1]
         if command == "list":
             await message.channel.send(crypto.coin_list)
@@ -74,14 +75,19 @@ async def on_message(message):
                 coin_id = 1
             elif coin =='btc':
                 coin_id = 0
-            currunt_price = round(crypto.get_price()[coin_id]) * float(count)
-            if currunt_price > money_dict[message.author.name]:
-                await message.channel.send("잔액이 부족합니다")
             else:
-                money_dict[message.author.name] -= currunt_price
-                coin_dict[message.author.name][coin_id] += float(count)
-                print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
-                await message.channel.send(f'{coin.upper()} successfully ordered')
+                coin = None
+            if coin is not None:
+                currunt_price = round(crypto.get_price()[coin_id]) * float(count)
+                if currunt_price > money_dict[message.author.name]:
+                    await message.channel.send("잔액이 부족합니다")
+                else:
+                    money_dict[message.author.name] -= currunt_price
+                    coin_dict[message.author.name][coin_id] += float(count)
+                    print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
+                    await message.channel.send(f'{coin.upper()} successfully ordered')
+            else:
+                await message.channel.send('coin cannot found')
         elif command == "sell":
             coin = message.content.split(' ')[2]
             count = message.content.split(' ')[3]
@@ -91,11 +97,16 @@ async def on_message(message):
                 coin_id = 1
             elif coin == 'btc':
                 coin_id = 0
-            currunt_price = round(crypto.get_price()[coin_id]) * float(count)
-            money_dict[message.author.name] += currunt_price
-            coin_dict[message.author.name][coin_id] -= float(count)
-            print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
-            await message.channel.send(f'{coin.upper()} successfully selled\nYour cryptos are BTC: {coin_dict[message.author.name][0]} ETH: {coin_dict[message.author.name][1]} DOGE: {coin_dict[message.author.name][2]}')
+            else:
+                coin_id = None
+            if coin_id is not None:
+                currunt_price = round(crypto.get_price()[coin_id]) * float(count)
+                money_dict[message.author.name] += currunt_price
+                coin_dict[message.author.name][coin_id] -= float(count)
+                print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
+                await message.channel.send(f'{coin.upper()} successfully selled\nYour cryptos are BTC: {coin_dict[message.author.name][0]} ETH: {coin_dict[message.author.name][1]} DOGE: {coin_dict[message.author.name][2]}')
+            else:
+                await message.channel.send('coin cannot found')
         elif command == 'wallet':
             command2 = message.content.split(' ')
             try:
