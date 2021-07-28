@@ -1,2 +1,8 @@
 discord
 python-dotenv
+pymongo
+selenium
+requests
+jamotools
+bs4
+beautifulsoup4

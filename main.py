@@ -1,3 +1,5 @@
+# 홀짝, 지갑생성, 돈 완료
+
 # -*- coding: utf-8 -*-
 import discord
 import random
@@ -33,7 +35,7 @@ loan_count_file.close()
 percent_file.close()
 coin_dict = {}
 coin_price = {}
-
+mongo = Mongo()
 
 def is_me(m):
     _bool = list(focus_.keys())
@@ -58,67 +60,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    if message.content.startswith('!crypto'):
-        coin_id = 0
-        command = message.content.split(' ')[1]
-        if command == "list":
-            await message.channel.send(crypto.coin_list)
-        elif command == "price":
-            coin_price = crypto.get_price()
-            await message.channel.send("Bitcoin: {}, Ethereum: {}, Doge: {}".format(str(coin_price[0]) + "￦", str(coin_price[1]) + "￦", str(coin_price[2])  + "￦"))
-        elif command == "buy":
-            coin = message.content.split(' ')[2]
-            count = message.content.split(' ')[3]
-            if coin == 'doge':
-                coin_id = 2
-            elif coin == 'eth':
-                coin_id = 1
-            elif coin =='btc':
-                coin_id = 0
-            else:
-                coin = None
-            if coin is not None:
-                currunt_price = round(crypto.get_price()[coin_id]) * float(count)
-                if currunt_price > money_dict[message.author.name]:
-                    await message.channel.send("잔액이 부족합니다")
-                else:
-                    money_dict[message.author.name] -= currunt_price
-                    coin_dict[message.author.name][coin_id] += float(count)
-                    print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
-                    await message.channel.send(f'{coin.upper()} successfully ordered')
-            else:
-                await message.channel.send('coin cannot found')
-        elif command == "sell":
-            coin = message.content.split(' ')[2]
-            count = message.content.split(' ')[3]
-            if coin == 'doge':
-                coin_id = 2
-            elif coin == 'eth':
-                coin_id = 1
-            elif coin == 'btc':
-                coin_id = 0
-            else:
-                coin_id = None
-            if coin_id is not None:
-                currunt_price = round(crypto.get_price()[coin_id]) * float(count)
-                money_dict[message.author.name] += currunt_price
-                coin_dict[message.author.name][coin_id] -= float(count)
-                print(coin_dict[message.author.name], ', ', coin_dict[message.author.name][coin_id])
-                await message.channel.send(f'{coin.upper()} successfully selled\nYour cryptos are BTC: {coin_dict[message.author.name][0]} ETH: {coin_dict[message.author.name][1]} DOGE: {coin_dict[message.author.name][2]}')
-            else:
-                await message.channel.send('coin cannot found')
-        elif command == 'wallet':
-            command2 = message.content.split(' ')
-            try:
-                if command2[2] == 'create':
-                    coin_dict[message.author.name] = {0:0, 1:0, 2:0}
-                    await message.channel.send('Your crypto wallet is created')
-            except IndexError:
-                wallet = coin_dict.get(message.author.name)
-                if wallet is None:
-                    await message.channel.send('Your crypto wallet not detected\nuse !crypto wallet create')
-                else:
-                    await message.channel.send(f"Bitcoin: {wallet.get(0)} Ethereum: {wallet.get(1)} Dogecoin: {wallet.get(2)}")
+    
             
     
     if focus_.get(message.author.id) is None:
@@ -339,4 +281,6 @@ async def on_message(message):
             await message.channel.send(message.author.mention + "님 지갑 생성이 완료되었습니다")
         print(money_dict)
 
+
 client.run(token)
+await client.http.send_message(channel_id='833675745347239936', content='hello')
