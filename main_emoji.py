@@ -1,17 +1,20 @@
-from functions.main import hol_jjak
-from functions.emoji import *
-from functions.sqlite import UserWallet
-from functions.choshung import chosung
 import base64
+import datetime
+
 from discord.ext import commands
-import asyncio
-import sqlite3
+
+from functions.choshung import chosung
+from functions.emoji import *
+from functions.main import hol_jjak
+from functions.sqlite import UserWallet
 
 bot = commands.Bot(command_prefix='!')
 TOKEN = base64.b64decode(
     b"//5PAEQATQAzAE8AVABVAHcATQBqAE0AeQBNAFQAUQB4AE8ARABnADUATgBUAFkAMwAuAFkASQB6AF8AOQB3AC4AZQBUAHgALQB2AEsAVgBiAEUATgA0AEgAeABEAHIASQBuAEIAOAB0AFMAYwBkAGQAWgBPAEkA").decode(
     "utf-16")
 wallet = UserWallet()
+focus_ = {}
+focus_time = {}
 
 
 @bot.event
@@ -21,6 +24,29 @@ async def on_ready():
     print('시작 했음')
     # wallet.verification_previous_hash()
     # wallet.backup()
+
+
+@bot.command()
+async def 집중(ctx):
+    if message.content.split(' ')[1] == '시작':
+        focus_time[ctx.author.id] = datetime.datetime.now()
+        focus_[ctx.author.id] = True
+    elif message.content.split(' ')[1] == "끝":
+        focus_[ctx.author.id] = False
+        time = datetime.datetime.now() - focus_time[ctx.author.id]
+        try:
+            time_sec = time.seconds
+        except AttributeError:
+            time_sec = 0
+        time_min = 0
+        time_hour = 0
+        if time_sec > 60:
+            time_min = time_sec // 60
+            time_sec = time_sec % 60
+        if time_min > 60:
+            time_hour = time_min // 60
+            time_min = time_min % 60
+        await message.channel.send(ctx.author.mention + f'님은 {time_hour}시간 {time_min}분 {time_sec}초동안 집중하셨습니다')
 
 
 @bot.command()
@@ -60,7 +86,6 @@ async def 초성게임(ctx):
     await chosung(ctx, wallet)
 
 
-# TODO 모빌상 + 친슈상이 장난침 인풋 필터링 당장 필수
 @bot.command()
 async def prefix(ctx):
     old_prefix = bot.command_prefix
@@ -70,6 +95,16 @@ async def prefix(ctx):
     else:
         bot.command_prefix = new_prefix
         await ctx.channel.send(f'My old prefix is {old_prefix}, and my new prefix is {new_prefix}')
+
+
+@bot.event
+async def on_message(message):
+    print(dir(message))
+    if focus_.get(message.author.id):
+        await message.delete()
+        await message.channel.send(message.author.mention + ' 딴짓 멈춰!!')
+    elif focus_.get(message.author.id) is None:
+        focus_[message.author.id] = False
 
 
 bot.run(TOKEN)
