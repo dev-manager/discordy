@@ -99,12 +99,21 @@ async def prefix(ctx):
 
 @bot.event
 async def on_message(message):
-    print(dir(message))
     if focus_.get(message.author.id):
-        await message.delete()
+        await message.channel.purge(limit=1)
         await message.channel.send(message.author.mention + ' 딴짓 멈춰!!')
     elif focus_.get(message.author.id) is None:
         focus_[message.author.id] = False
+    else:
+        msg = message.message.content
+        if msg.startswith("prefix"):
+            await prefix(ctx=message)
+        elif msg.startswith("집중"):
+            await 집중(ctx=message)
+        elif msg.startswith("홀짝"):
+            await 홀짝(ctx=message)
+        elif msg.startswith("지갑생성"):
+            await 지갑생성(ctx=message)
 
 
 bot.run(TOKEN)

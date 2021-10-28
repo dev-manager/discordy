@@ -12,7 +12,7 @@ class UserWallet:
         path = 'E:/discordy/database/database.db'
         self.ins_sql = 'insert into users values(?, ?, ?, ?)'
         self.select_sql = 'select * from users'
-        self.update_sql = "update users set {}={} where user_id='{}'"
+        self.update_sql = "update users set {} = {} where user_id='{}'"
         self.dict = ['user_id', 'money', 'loan', 'loan_count']
         self.hash = ''
         try:
