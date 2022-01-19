@@ -2,6 +2,7 @@ import base64
 import datetime
 
 from discord.ext import commands
+import discord
 
 from functions.choshung import chosung
 from functions.emoji import *
@@ -28,10 +29,10 @@ async def on_ready():
 
 @bot.command()
 async def 집중(ctx):
-    if message.content.split(' ')[1] == '시작':
+    if ctx.message.content.split(' ')[1] == '시작':
         focus_time[ctx.author.id] = datetime.datetime.now()
         focus_[ctx.author.id] = True
-    elif message.content.split(' ')[1] == "끝":
+    elif ctx.message.content.split(' ')[1] == "끝":
         focus_[ctx.author.id] = False
         time = datetime.datetime.now() - focus_time[ctx.author.id]
         try:
@@ -52,7 +53,7 @@ async def 집중(ctx):
 @bot.command()
 async def 홀짝(ctx):
     global money_dict
-    money_dict = await hol_jjak(ctx, bot, 홀짝, emojis, wallet)
+    money_dict = hol_jjak(ctx, bot, 홀짝, emojis, wallet)
 
 
 @bot.command()
@@ -72,18 +73,18 @@ async def 돈(ctx):
 @bot.command()
 async def 대출(ctx):
     wallet.make_loan(ctx)
-    ctx.channel.send('대출이 완료되었습니다')
+    await ctx.channel.send('대출이 완료되었습니다')
 
 
 @bot.command()
 async def 상환(ctx):
     wallet.delete_loan(ctx)
-    ctx.channel.send('상환이 완료되었습니다')
+    await ctx.channel.send('상환이 완료되었습니다')
 
-
-@bot.command()
-async def 초성게임(ctx):
-    await chosung(ctx, wallet)
+# 제거후 타 프로젝트로 이관
+# @bot.command()
+# async def 초성게임(ctx):
+#     await chosung(ctx, wallet)
 
 
 @bot.command()
@@ -105,15 +106,6 @@ async def on_message(message):
     elif focus_.get(message.author.id) is None:
         focus_[message.author.id] = False
     else:
-        msg = message.message.content
-        if msg.startswith("prefix"):
-            await prefix(ctx=message)
-        elif msg.startswith("집중"):
-            await 집중(ctx=message)
-        elif msg.startswith("홀짝"):
-            await 홀짝(ctx=message)
-        elif msg.startswith("지갑생성"):
-            await 지갑생성(ctx=message)
-
+        await bot.process_commands(message)
 
 bot.run(TOKEN)

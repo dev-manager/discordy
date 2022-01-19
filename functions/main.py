@@ -40,13 +40,15 @@ async def hol_jjak(ctx, bot, hol_jjak_, emojis, wallet):
             betting_money = 10000
         elif betting == emojis[3].id:
             is_all_in = True
-            betting_money = mongo.get_dict(ctx.message.author.id)["money"]
+            betting_money = wallet.get_money(ctx)
         
         def check2(reaction, user):
+            global ctx
             return user == ctx.message.author and str(reaction) in ['<:hol:843804087912890409>',
                                                                     '<:jjak:843804087938187294>']
         
         def check3(reaction, user):
+            global ctx
             return user == ctx.message.author and str(reaction) in ['<:one_more:843814702056210452>',
                                                                     '<:nono:843814701958823937>']
         

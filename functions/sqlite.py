@@ -1,15 +1,13 @@
 import sqlite3
 from hashlib import sha512
-from sqlite3.dbapi2 import Cursor
 from time import time
 import pickle
 
 
 class UserWallet:
-    cursor: Cursor
 
     def __init__(self):
-        path = 'E:/discordy/database/database.db'
+        path = 'database/database.db'
         self.ins_sql = 'insert into users values(?, ?, ?, ?)'
         self.select_sql = 'select * from users'
         self.update_sql = "update users set {} = {} where user_id='{}'"
