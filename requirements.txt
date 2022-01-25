@@ -6,3 +6,4 @@ requests
 jamotools
 bs4
 beautifulsoup4
+nextcord
