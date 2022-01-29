@@ -9,7 +9,10 @@ from func.emoji import *
 from func.main import hol_jjak
 from func.postgresql import UserWallet
 from func.stock import Stock
+import dhooks
+import dotenv
 
+auth = dotenv.dotenv_values(r"C:\discordy\auth.env")
 bot = commands.Bot(command_prefix='~')
 TOKEN = base64.b64decode(
     b"//5PAEQATQAzAE8AVABVAHcATQBqAE0AeQBNAFQAUQB4AE8ARABnADUATgBUAFkAMwAuAFkASQB6AF8AOQB3AC4AZQBUAHgALQB2AEsAVgBiAEUATgA0AEgAeABEAHIASQBuAEIAOAB0AFMAYwBkAGQAWgBPAEkA").decode(
@@ -26,6 +29,11 @@ async def on_ready():
     stock = Stock(wallet, bot, emojis)
     stock.thread.start()
     print('시작 했음')
+
+
+@bot.event
+async def on_command_error(self, error):
+    dhooks.Webhook(auth["webhook_url"]).send(f"에러 발생: {error}")
 
 
 @bot.command()
