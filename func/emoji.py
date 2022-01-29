@@ -1,5 +1,6 @@
-async def get_emojis(bot):
-    hundred, thousand, ten_thousand, all_in, hol, jjak, one_more, nono, yes, no = ['', '', '', '', '', '', '', '', '', '']
+def get_emojis(bot):
+    hundred, thousand, ten_thousand, all_in, hol, jjak, one_more, nono, yes, no, o, x = ['', '', '', '', '', '', '', '',
+                                                                                         '', '', '', '']
     for i in bot.emojis:
         if i.name == '100':
             hundred = i
@@ -21,8 +22,12 @@ async def get_emojis(bot):
             yes = i
         elif i.name == "cancel":
             no = i
+        elif i.name == "O_":
+            o = i
+        elif i.name == "X_":
+            x = i
         else:
             pass
-    
-    emojis = [hundred, thousand, ten_thousand, all_in, hol, jjak, one_more, nono, yes, no]
+
+    emojis = [hundred, thousand, ten_thousand, all_in, hol, jjak, one_more, nono, yes, no, o, x]
     return emojis
